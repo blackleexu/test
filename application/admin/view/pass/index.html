@@ -1,0 +1,107 @@
+{layout name="public/home"/}
+<div class="header">
+    <h1 class="page-header">
+        教师用户列表
+    </h1>
+    <!--<ol class="breadcrumb">-->
+    <!--<li><a href="#">Home</a></li>-->
+    <!--<li><a href="#">Empty</a></li>-->
+    <!--<li class="active">Data</li>-->
+    <!--</ol>-->
+
+</div>
+<div id="page-inner" style="min-height: 600px">
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Advanced Tables -->
+            <div class="panel panel-default">
+                {if(session('teachererror'))}
+                <div class="alert alert-danger">
+                    <ul>
+                        <li>{$Think.session.teachererror}</li>
+                    </ul>
+                </div>
+                {elseif(session('teachersuccess'))}
+                <div class="alert alert-success">
+                    <ul>
+                        <li>{$Think.session.teachersuccess}</li>
+                    </ul>
+                </div>
+                {/if}
+                <div class="panel-heading">
+                    Teachers Tables
+                </div>
+                <div class="panel-body">
+                    <div >
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>头像</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {volist name='teacher' id='vo'}
+                            <tr class="odd gradeX">
+                                <td>{$i}</td>
+                                <td>{$vo.teachername}</td>
+                                <td><img src="__STATIC__/img/{$vo.pic}" width="50px" alt=""></td>
+                                <td><a href="#" data-toggle="modal" data-target="#update_dialog" onclick="jsedit({$vo.teacherId})"><button type="button" class="btn btn-primary">修改密码</button></a>
+                                    <!--url('admin/typedel',['id'=>$v->tid])-->
+                                </td>
+                            </tr>
+                            {/volist}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--End Advanced Tables -->
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="update_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel1">请填写新密码</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="{:url('admin/tpupdt')}" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="hidden" name="teacherId" id="teacherid">
+                        <label class="col-md-2 control-label">用户名</label>
+                        <div class="col-md-10">
+                            <input class="form-control" id="username" placeholder="用户名" name="teachername" >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">密码</label>
+                        <div class="col-md-10">
+                            <input type="password" class="form-control" id="password" placeholder="密码:6-12位" name="password">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="submit" name="" value="提交" class="btn btn-default">
+                        <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function jsedit(tid){
+        //从数据库中根据tid获取记录
+        $.getJSON(
+            "{:url('admin/teachedit')}",{"teacherId":tid},function(json){
+                $("#teacherid").val(json.teacherId);
+                $("#username").val(json.teachername);
+                // $("#password").val(json.password);
+            });
+    }
+</script>
