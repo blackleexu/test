@@ -12,15 +12,8 @@ use think\Session;
 class Index extends BaseController
 {
     public function index(){
-        //联查用户基本信息
-        $key=input('param.key','');
-        $data=Db::table('user')
-        ->alias('a')
-        ->join('department d','a.did=d.did')
-        ->join('role r','a.rid=r.rid')
-        ->field('uid,uname,a.did,a.rid,department,rolename,hobby')
-        ->where('uname','like','%'.$key.'%')
-        ->select();
+        $data  = (new User())->getUserList();
+
         //爱好表查询
         $hobby=Db::table('hobby')->select();
         //用户表爱好id转对应的爱好名
@@ -91,7 +84,7 @@ class Index extends BaseController
 
     public function userDel(){
         $id=input('param.uid');
-        $re=User::destroy($id);
+        $re=User::destroy(['uid'=>$id]);
         if ($re){
             $data=[
                 'status'=>0,
