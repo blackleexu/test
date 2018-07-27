@@ -18,7 +18,7 @@ Route::group('admin',function () {
     Route::any('index', 'Index/index');
     Route::any('edit', 'Index/edit');
     Route::any('userdel', 'Index/userDel');
-    Route::any('useradd', 'Index/useradd');
+    Route::any('useradd', 'Index/userAdd');
     Route::any('userupdate', 'Index/userUpdate');
     Route::any('dpchange', 'Index/dpChange');
     Route::any('rolechange', 'Index/roleChange');

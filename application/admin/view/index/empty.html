@@ -25,7 +25,11 @@
                 {/if}
 
                 <div class="panel-heading">
-                    activity Tables
+                    <form class="form-horizontal" action="{:url('admin/index')}" method="post" enctype="multipart/form-data" style="margin: 0 auto">
+                        <lable class="control-label col-md-1">搜索</lable>
+                        <input class="col-md-2 form-control" type="text" name="key"  placeholder="请输入关键字" autocomplete="off" style="width: 30%;">
+                        <input type="submit" name="" value="提交" class="btn btn-default">
+                    </form>
                     <a href="#"  data-toggle="modal" data-target="#add_dialog" style="float: right"><i class="fa fa-plus ">New Classification</i></a>
                 </div>
                 <div class="panel-body">
@@ -49,20 +53,22 @@
                                 <td>{$vo.uname}</td>
                                 <td>
                                     <!--{$vo.department}-->
-                                    <select class="form-control" name="did" id="dp{$vo.uid}" onchange="departmentChange({$vo.uid})">
+                                    <select class="form-control" name="did" id="dp{$vo.uid}" onchange="departmentChange({$vo.uid})" style="width: 100%">
                                         {volist name="department" id="value"}
                                         <option value="{$value.did}"  {$value.did==$vo.did?'selected':''}>{$value.department}</option>
                                         {/volist}
                                     </select>
                                 </td>
                                 <td>
-                                    <select class="form-control" name="rid" id="role{$vo.uid}" onchange="roleChange({$vo.uid})">
+                                    <select class="form-control" name="rid" id="role{$vo.uid}" onchange="roleChange({$vo.uid})" style="width: 100%">
                                         {volist name="role" id="value"}
                                         <option value="{$value.rid}"  {$value.rid==$vo.rid?'selected':''}>{$value.rolename}</option>
                                         {/volist}
                                     </select>
                                 </td>
-                                <td>{$vo.hobby}</td>
+                                <td>{$vo.hobby}
+
+                                </td>
                                 <!--<td>{|msubstr=0,20,'utf-8',true}</td>-->
                                 <td><a href="javascript:;" data-toggle="modal" data-target="#update_dialog" onclick="jsedit({$vo.uid})"><button type="button" class="btn btn-primary">修改</button></a>
                                     <!--url('admin/typedel',['id'=>$v->tid])-->
@@ -119,7 +125,7 @@
                         <div class="col-md-10">
                             {volist name="hobby" id="vo"}
                             <label class="checkbox-inline">
-                                <input type="checkbox" name="hobby"  value="{$vo.hid}"> {$vo.hobby}
+                                <input type="checkbox" name="hobby[]" id="hobby{$vo.hid}"  value="{$vo.hid}"> {$vo.hobby}
                             </label>
                             {/volist}
                         </div>
@@ -182,7 +188,7 @@
                         <div class="col-md-10">
                             {volist name="hobby" id="vo"}
                             <label class="checkbox-inline">
-                                <input type="checkbox" name="hobby"  value="{$vo.hid}"> {$vo.hobby}
+                                <input type="checkbox" name="hobby[]"  value="{$vo.hid}"> {$vo.hobby}
                             </label>
                             {/volist}
                         </div>
@@ -201,14 +207,22 @@
 </div>
 
 <script type="text/javascript">
-    function jsedit(uid){
+
+    function jsedit(uid) {
         //从数据库中根据tid获取记录
         $.getJSON(
-            "{:url('admin/edit')}",{"uid":uid},function(json){
+            "{:url('admin/edit')}", {"uid": uid}, function (json) {
                 $("#uid").val(json.uid);
                 $("#uname").val(json.uname);
                 $("#department").val(json.did);
                 $("#role").val(json.rid);
+                var checkbox = $('#hobby1').children("input");
+                // alert(json.hobby);
+                for (i = 1; i <=json.count; i++) {
+                    $("#hobby" + i).prop("checked", false);
+                    if (json.hobby.indexOf('' + i)!=-1)
+                        $("#hobby" + i).prop("checked", true);
+                }
             });
     }
 
@@ -216,13 +230,15 @@
         layer.confirm('确认删除',{btn:['确认','取消']},
             function () {
                 $.post("{:url('admin/userdel')}",{"uid":id},function (data) {
-                    if(date.status==0){
+                    // alert(data.msg);
+                    if(data.status==0){
                         location.href=location.href;//刷新页面
-                        layer.msg(data.msg,{icon:6});
+                        layer.msg(data.msg,{icon:6,time:500});
                     }else{
-                        layer.msg(data.msg,{icon:5});
+                        layer.msg(data.msg,{icon:5,time:500});
                     }
                 });
+
             },function () {
             });
     }
@@ -231,12 +247,12 @@
         //获取当前选择的option
         var position="#dp"+id;
         var did=$(position).children('option:selected').val();
-        alert(id+"-"+did);
+        // alert(id+"-"+did);
         $.post("{:url('admin/dpchange')}",{"uid":id,"did":did},function (data) {
             if(data.status==1){
-                layer.msg(data.msg,{icon:6});
+                layer.msg(data.msg,{icon:6,time:500});
             }else{
-                layer.msg(data.msg,{icon:5});
+                layer.msg(data.msg,{icon:5,time:500});
             }
         })
     }
@@ -244,12 +260,12 @@
         //获取当前选择的option
         var position="#role"+id;
         var rid=$(position).children('option:selected').val();
-        alert(id+"-"+rid);
+        // alert(id+"-"+rid);
         $.post("{:url('admin/rolechange')}",{"uid":id,"rid":rid},function (data) {
             if(data.status==1){
-                layer.msg(data.msg,{icon:6});
+                layer.msg(data.msg,{icon:6,time:500},);
             }else{
-                layer.msg(data.msg,{icon:5})
+                layer.msg(data.msg,{icon:5,time:500})
             }
         })
     }

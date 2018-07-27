@@ -12,36 +12,43 @@ use think\Session;
 class Index extends BaseController
 {
     public function index(){
+        //联查用户基本信息
+        $key=input('param.key','');
         $data=Db::table('user')
         ->alias('a')
         ->join('department d','a.did=d.did')
         ->join('role r','a.rid=r.rid')
         ->field('uid,uname,a.did,a.rid,department,rolename,hobby')
+        ->where('uname','like','%'.$key.'%')
         ->select();
-//        $h=$this->convert($data['hobby']);
-//        $data['hobby']=$h;
-        foreach ($data['hobby'] as $va){
-
+        //爱好表查询
+        $hobby=Db::table('hobby')->select();
+        //用户表爱好id转对应的爱好名
+        for ($i=0;$i<count($data);$i++){
+            $tmp=explode(",",$data[$i]['hobby']);
+            $data[$i]['hobby']='';
+            for ($j=0;$j<count($tmp);$j++){
+//                $data[$i]['hobby'].=$hobby[intval($data[$i]['hobby'][$j])];
+                $data[$i]['hobby'].=$hobby[intval($tmp[$j])-1]['hobby'].',';
+            }
+            $data[$i]['hobby']=substr($data[$i]['hobby'],0,strlen($data[$i]['hobby'])-1);
         }
-//        dump($data);
-//        die();
+
         $department=Db::table('department')->select();
         $role=Db::table('role')->select();
-        $hobby=Db::table('hobby')->select();
+
         $this->assign('user',$data);
         $this->assign('department',$department);
         $this->assign('role',$role);
         $this->assign('hobby',$hobby);
         return $this->fetch('index/empty');
     }
-    public function convert($str){
-        $array = explode(",",$str);
-        return $array;
-    }
+
     public function edit(){
         $id=input("param.uid");
         $data=User::find($id);
-        echo $data->hidden(['create_at','update_at','delete_time','password'])->toJson();
+        $data['count']=Db::table('hobby')->count();
+        echo $data->hidden(['create_at','update_at','delete_at','password'])->toJson();
     }
 
     public function dpChange(){
@@ -62,6 +69,7 @@ class Index extends BaseController
         }
         return $result;
     }
+
     public function roleChange(){
         $uid=input('param.uid');
         $rid=input('param.rid');
@@ -83,55 +91,53 @@ class Index extends BaseController
 
     public function userDel(){
         $id=input('param.uid');
-
-        Db::startTrans();
         $re=User::destroy($id);
-        if($re){
-            Db::commit();
-        }else{
-            Db::rollback();
-        }
         if ($re){
-            $date=[
+            $data=[
                 'status'=>0,
                 'msg'=>'删除成功'
             ];
         }else{
-            $date=[
+            $data=[
                 'status'=>1,
                 'msg'=>'删除失败'
             ];
         }
-        return $date;
+        return $data;
     }
 
     public function userAdd(Request $request){
-        //对数据进行过滤，防止未知的用户输入风险（sql注入、恶意输入）
-//        $request->filter(['strip_tags','htmlspecialchars']);
-        $typename= $request->post('typename');
+        $data= $request->post();
+        $data['password']=md5($data['password']);
+
+        $str='';
+        for($i=0;$i<count($data['hobby']);$i++){
+            $str.=$data['hobby'][$i].",";
+        }
+        $data['hobby']=substr($str,0,strlen($str)-1);
 
         //获取数据列数
         $model=new User();
-        $num=$model->where("typename='$typename'")->Count();
+        $result=$model->validate(true)->save($data);
 
-        if($num>0){
-            Session::flash('typeerror',"该类型已存在");
+        if($result){
+            Session::flash('usersuccess',"添加成功");
             $this->redirect('admin/index');
         }else{
-            $data=["typename"=>$typename];
-            if($model->save($data)){
-                Session::flash('typesuccess',"添加成功");
-                $this->redirect('admin/index');
-            }else{
-                Session::flash('typeerror',"添加失败");
-                $this->redirect('admin/index');
-            }
+            Session::flash('usererror',$model->getError());
+            $this->redirect('admin/index');
         }
     }
+
     public function userUpdate(){
         $data=input("param.");
-        dump($data);
-        die();
+        $str='';
+        for($i=0;$i<count($data['hobby']);$i++){
+            $str.=$data['hobby'][$i].",";
+        }
+        $data['hobby']=substr($str,0,strlen($str)-1);
+//        dump($data);
+//        die();
         $user=new User();
         $result=$user->validate(true)->save($data,['uid'=>$data['uid']]);
         if(!$result){
@@ -142,7 +148,6 @@ class Index extends BaseController
             $this->redirect('admin/index');
         }
     }
-
 
     public function create()
     {
