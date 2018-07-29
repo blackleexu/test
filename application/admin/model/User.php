@@ -24,7 +24,7 @@ class User extends Model
      */
     public function getUserList(){
         $key = input('param.key','');
-
+        $department_key=input('param.departmentkey');
         $user_search = Db::table('user')
             ->alias('a')
             ->join('department d','a.did=d.did')
@@ -35,6 +35,9 @@ class User extends Model
 
         if(trim($key)){
             $user_search->where('uname','like','%'.$key.'%');
+        }
+        if(trim($department_key)){
+            $user_search->where('department',$department_key);
         }
 
         return $user_search->select();

@@ -13,7 +13,6 @@ class Index extends BaseController
 {
     public function index(){
         $data  = (new User())->getUserList();
-
         //爱好表查询
         $hobby=Db::table('hobby')->select();
         //用户表爱好id转对应的爱好名
@@ -142,40 +141,59 @@ class Index extends BaseController
         }
     }
 
-    public function create()
-    {
-        //
+    public function getDepartmentList(){
+        $result=[];
+        $children=[];
+        $department_list_arr=Db::table('department')->select();
+
+        $result[0]['name']='部门';
+        for ($i=0;$i<count($department_list_arr);$i++){
+            $children[$i]['name'] = $department_list_arr[$i]['department'];
+            $children[$i]['id'] = $department_list_arr[$i]['did'];
+        }
+        $result[0]['children']=$children;
+        $result[0]['spread']=true;
+        return $result;
+//        return json_encode($result);
     }
 
-    /**
-     * 保存新建的资源
-     *
-     * @param  \think\Request  $request
-     * @return \think\Response
-     */
-    public function save(Request $request)
-    {
-        //
+    public function getRoleList(){
+        $result=[];
+        $children=[];
+        $role_list_arr=Db::table('role')->select();
+
+        $result[0]['name']='职位';
+        for ($i=0;$i<count($role_list_arr);$i++){
+            $children[$i]['name'] = $role_list_arr[$i]['rolename'];
+            $children[$i]['id'] = $role_list_arr[$i]['rid'];
+        }
+        $result[0]['children']=$children;
+        return $result;
     }
 
-    /**
-     * 显示指定的资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function read($id)
-    {
-        //
+    public function array_to_json(array $arr){
+        $result=[];
+        for ($i=0;$i<count($arr);$i++){
+            $result[$i]['name'] = $arr[$i]['department'];
+            $result[$i]['id'] = $arr[$i]['did'];
+        }
+        return json_encode($result);
     }
-    /**
-     * 删除指定资源
-     *
-     * @param  int  $id
-     * @return \think\Response
-     */
-    public function delete($id)
-    {
-        //
+
+    public function getItemByKey(){
+        $data  = (new User())->getUserList();
+        //爱好表查询
+        $hobby=Db::table('hobby')->select();
+        //用户表爱好id转对应的爱好名
+        for ($i=0;$i<count($data);$i++){
+            $tmp=explode(",",$data[$i]['hobby']);
+            $data[$i]['hobby']='';
+            for ($j=0;$j<count($tmp);$j++){
+//                $data[$i]['hobby'].=$hobby[intval($data[$i]['hobby'][$j])];
+                $data[$i]['hobby'].=$hobby[intval($tmp[$j])-1]['hobby'].',';
+            }
+            $data[$i]['hobby']=substr($data[$i]['hobby'],0,strlen($data[$i]['hobby'])-1);
+        }
+        return $data;
     }
 }

@@ -22,5 +22,8 @@ Route::group('admin',function () {
     Route::any('userupdate', 'Index/userUpdate');
     Route::any('dpchange', 'Index/dpChange');
     Route::any('rolechange', 'Index/roleChange');
+    Route::any('getdepartment', 'Index/getDepartmentList');
+    Route::any('getrole', 'Index/getRoleList');
+    Route::any('getitem', 'Index/getItemByKey');
 });
 
