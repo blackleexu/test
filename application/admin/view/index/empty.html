@@ -25,11 +25,11 @@
                 {/if}
 
                 <div class="panel-heading">
-                    <form class="form-horizontal" action="{:url('admin/index')}" method="post" enctype="multipart/form-data" style="margin: 0 auto">
+                    <!--<form class="form-horizontal" action="{:url('admin/index')}" method="post" enctype="multipart/form-data" style="margin: 0 auto">-->
                         <lable class="control-label col-md-1">搜索</lable>
-                        <input class="col-md-2 form-control" type="text" name="key"  placeholder="请输入关键字" autocomplete="off" style="width: 30%;">
-                        <input type="submit" name="" value="提交" class="btn btn-default">
-                    </form>
+                        <input class="col-md-2 form-control" type="text" id="search_key" name="key"  placeholder="请输入关键字" autocomplete="off" style="width: 30%;">
+                        <input type="button" id="submit" name="" value="提交" class="btn btn-default" onclick="search()">
+                    <!--</form>-->
                     <a href="#"  data-toggle="modal" data-target="#add_dialog" style="float: right;color: #0C0C0C"><i class="fa fa-plus ">New Classification</i></a>
                 </div>
                 <div class="panel-body">
@@ -58,24 +58,25 @@
                                     </td>
                                     <td><a href="javascript:;"><button type="button" id="template_del" class="btn btn-danger" onclick="">删除</button></a></td>
                                 </tr>
-                                {volist name='user' id='vo'}
+                                {volist name='data_list' id='vo'}
                                 <tr class="odd gradeX">
                                     <td>{$vo.uid}</td>
                                     <td>{$vo.uname}</td>
                                     <td>
-                                        {$vo.department}
-                                        <!--<select class="form-control" name="did" id="dp{$vo.uid}" onchange="departmentChange({$vo.uid})" style="width: 100%">-->
-                                            <!--{volist name="department" id="value"}-->
-                                            <!--<option value="{$value.did}"  {$value.did==$vo.did?'selected':''}>{$value.department}</option>-->
-                                            <!--{/volist}-->
-                                        <!--</select>-->
+                                        <!--{$vo.department}-->
+                                        <select class="form-control" name="did" id="dp{$vo.uid}" onchange="departmentChange({$vo.uid})" style="width: 100%">
+                                            {volist name="department" id="value"}
+                                            <option value="{$value.did}"  {$value.did==$vo.did?'selected':''}>{$value.department}</option>
+                                            {/volist}
+                                        </select>
                                     </td>
-                                    <td>{$vo.rolename}
-                                        <!--<select class="form-control" name="rid" id="role{$vo.uid}" onchange="roleChange({$vo.uid})" style="width: 100%">-->
-                                            <!--{volist name="role" id="value"}-->
-                                            <!--<option value="{$value.rid}"  {$value.rid==$vo.rid?'selected':''}>{$value.rolename}</option>-->
-                                            <!--{/volist}-->
-                                        <!--</select>-->
+                                    <td>
+                                        <!--{$vo.rolename}-->
+                                        <select class="form-control" name="rid" id="role{$vo.uid}" onchange="roleChange({$vo.uid})" style="width: 100%">
+                                            {volist name="role" id="value"}
+                                            <option value="{$value.rid}"  {$value.rid==$vo.rid?'selected':''}>{$value.rolename}</option>
+                                            {/volist}
+                                        </select>
                                     </td>
                                     <td>{$vo.hobby}</td>
                                     <td><a href="javascript:;" data-toggle="modal" data-target="#update_dialog" onclick="jsedit({$vo.uid})"><button type="button" class="btn btn-primary">修改</button></a></td>
@@ -85,7 +86,7 @@
                             </div>
                             </tbody>
                         </table>
-                        {/*{$user->render()} */}
+                        {$paginator->render()}
                     </div>
                 </div>
             </div>
@@ -100,7 +101,8 @@
                 <h4 class="modal-title" id="myModalLabel">修改用户信息</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" action="{:url('admin/userupdate')}" method="post" enctype="multipart/form-data">
+                <!--<form id="user_update" class="form-horizontal" action="{:url('admin/userupdate')}" method="post" enctype="multipart/form-data">-->
+                <form id="user_update" class="form-horizontal" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <input type="hidden" name="uid" id="uid">
                         <label class="col-md-2 control-label">用户名</label>
@@ -140,13 +142,13 @@
                     </div>
 
                     <div class="modal-footer">
-                        <input type="submit" name="" value="提交" class="btn btn-default">
+                        <!--<input type="submit" name="" value="提交" class="btn btn-default">-->
+                        <input type="button" name="" value="提交" onclick="userupdate()" class="btn btn-default" >
                         <!--<input type="reset" name="" value="重置" class="btn btn-default">-->
                         <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭</button>
                     </div>
                 </form>
             </div>
-
         </div>
     </div>
 </div>
@@ -215,7 +217,6 @@
 </div>
 
 <script type="text/javascript">
-
     function jsedit(uid) {
         //从数据库中根据tid获取记录
         $.getJSON(
@@ -234,6 +235,41 @@
             });
     }
 
+
+
+    function userupdate() {
+        var form =  $("#user_update").serialize();
+        $.post("{:url('admin/userupdate')}",form,function (data) {
+            // alert(data.status);
+            console.log(data);
+            $('.modal').map(function () {
+                if (!$(this).is(":hidden")){
+                    $(this).modal('hide');
+                }
+            });
+            if(typeof data.status==0) {
+                layer.msg(data.msg,{icon:6,time:500});
+            }else{
+                $('#usertable').html($(data).find('#usertable').html());
+            }
+        })
+    }
+
+    function search() {
+        var key = $("#search_key").val();
+        $.post("{:url('admin/index')}",{'key':key},function (data) {
+            $('#usertable').html($(data).find('#usertable').html());
+        });
+    }
+    $("#search_key").keydown(function (event) {
+        if (event.keyCode == "13") {
+            search();
+            return false;
+        }
+    });
+
+
+
     function userdel(id) {
         layer.confirm('确认删除',{btn:['确认','取消']},
             function () {
@@ -246,16 +282,14 @@
                         layer.msg(data.msg,{icon:5,time:500});
                     }
                 });
-
             },function () {
-            });
+        });
     }
 
     function  departmentChange(id) {
         //获取当前选择的option
         var position="#dp"+id;
         var did=$(position).children('option:selected').val();
-        // alert(id+"-"+did);
         $.post("{:url('admin/dpchange')}",{"uid":id,"did":did},function (data) {
             if(data.status==1){
                 layer.msg(data.msg,{icon:6,time:500});
@@ -268,7 +302,6 @@
         //获取当前选择的option
         var position="#role"+id;
         var rid=$(position).children('option:selected').val();
-        // alert(id+"-"+rid);
         $.post("{:url('admin/rolechange')}",{"uid":id,"rid":rid},function (data) {
             if(data.status==1){
                 layer.msg(data.msg,{icon:6,time:500},);

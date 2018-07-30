@@ -5,8 +5,7 @@ use think\Db;
 use think\Model;
 use traits\model\SoftDelete;
 
-class User extends Model
-{
+class User extends Model{
     use SoftDelete;
     protected $autoWriteTimestamp="datetime";
     protected $table='user';
@@ -16,13 +15,8 @@ class User extends Model
     protected $deleteTime = 'delete_at';
 
     /**
-     *
-     * 返回用户信息列表
-     * @access public
-     * @param string
-     * @return array [
-     *      ['name'=>'xxx','sex'=>'1']
-     * ]
+     * @return \think\Paginator
+     * @throws \think\exception\DbException
      */
     public static function getUserList(){
         $key = input('param.key','');
@@ -38,24 +32,25 @@ class User extends Model
 
         if(trim($key)){
             $user_search->where('uname','like','%'.$key.'%');
+            return $user_search->paginate(5,false,['query'=>['key'=>$key]]);
         }
-        if(trim($click_department_key)){
+        if(trim($click_department_key)!=''){
             $user_search->where('department','like','%'.$click_department_key.'%');
+            return $user_search->paginate(5,false,['query'=>['click_department_key'=>$click_department_key]]);
         }
         if(trim($click_role_key)!=''){
             $user_search->where('rolename','like','%'.$click_role_key.'%');
+            return $user_search->paginate(5,false,['query'=>['click_role_key'=>$click_role_key]]);
         }
 
-//        return $user_search->paginate(3);
-        return $user_search->select();
+        return $user_search->paginate(5);
     }
 
     /**
-     * @access public static
-     * @return array[
-     *      hid=1,
-     *      hobby='跑步'
-     * ]
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getHobbyList(){
         $hobby_list=Db::table('hobby')->select();
@@ -63,11 +58,10 @@ class User extends Model
     }
 
     /**
-     * @access public static
-     * @return array[
-     *      did=1,
-     *      department='PHP_department''
-     * ]
+     * @return false|\PDOStatement|string|\think\Collection
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
      */
     public static function getDepartmentList(){
         $dpment_list=Db::table('department')->select();
@@ -76,10 +70,7 @@ class User extends Model
 
     /**
      * @access public static
-     * @return array[
-     *      rid=1,
-     *      rolename='组长''
-     * ]
+     * @return array
      */
     public static function getRoleList(){
         $role_list=Db::table('role')->select();
@@ -87,20 +78,19 @@ class User extends Model
     }
 
     /**
-     * @param array  //
+     * @param array
      * @param string
      * @param string
      * @param bool
      * @return array
      */
-    public static function tree_item_click($data,$str_id,$str_name,$spread)
-    {
+    public static function tree_item_click($data,$str_id,$str_name,$spread,$tab_name){
         $result=[];
         $children=[];
-        $result[0]['name']='部门';
+        $result[0]['name']=$tab_name;
         for ($i=0;$i<count($data);$i++){
             if(is_array($data[$i])){
-                self::tree_item_click($data[$i],$str_id,$str_name);
+                self::tree_item_click($data[$i],$str_id,$str_name,$tab_name);
             }else{
                 $children[$i]['name'] = $data[$i][$str_name];
                 $children[$i]['id'] = $data[$i][$str_id];

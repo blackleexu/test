@@ -3,31 +3,29 @@ namespace app\admin\controller;
 
 use app\admin\model\User;
 use app\admin\model\Hobby;
-use app\admin\model\Login;
 use app\admin\model\Department;
 use app\admin\model\Role;
 use think\Db;
-use think\Paginator;
 use think\Request;
 use think\Session;
 
-class Index extends BaseController
-{
+class Index extends BaseController{
     public function index(){
-        $data  = User::getUserList();
+        $paginator  = User::getUserList();
         //爱好表查询
-        $hobby=Hobby::all();
-        //根据爱好id获取对应的爱好名
-        Hobby::hobby_convert($data,$hobby);
+        $hobby =  Hobby::all();
+        $data_list = Hobby::hobby_convert($paginator,$hobby);
         //部门查询
-        $department=User::getDepartmentList();
+        $department = User::getDepartmentList();
         //角色查询
-        $role=Role::all();
+        $role = Role::all();
 
-        $this->assign('user',$data);
+        $this->assign('data_list',$data_list);
+        $this->assign('paginator',$paginator);
         $this->assign('department',$department);
         $this->assign('role',$role);
         $this->assign('hobby',$hobby);
+
         return $this->fetch('index/empty');
     }
 
@@ -118,28 +116,34 @@ class Index extends BaseController
 
     public function userUpdate(){
         $data=input("param.");
-
         $data['hobby']=Hobby::hobby_format_before_update($data);
-
         $user=new User();
         $result=$user->validate(true)->save($data,['uid'=>$data['uid']]);
         if(!$result){
-            Session::flash('usererror',$user->getError());
-            $this->redirect('admin/index');
+            return $update_result=[
+                'status'=>0,
+                'msg'=>'修改失败'
+            ];
+//            $this->redirect('admin/index');
+//            $this->index();
         }else{
-            Session::flash('usersuccess',"修改成功");
+//            return $update_result=[
+//                'status'=>1,
+//                'msg'=>'修改成功'
+//            ];
             $this->redirect('admin/index');
+//            $this->index();
         }
     }
 
     public function getDepartmentList(){
         $department_list_arr=Department::all();
-        return User::tree_item_click($department_list_arr,'did','department',true);
+        return User::tree_item_click($department_list_arr,'did','department',true,'部门');
     }
 
     public function getRoleList(){
         $role_list_arr=Role::all();
-        return User::tree_item_click($role_list_arr,'rid','rolename',true);
+        return User::tree_item_click($role_list_arr,'rid','rolename',true,'职位');
     }
 
     public function getItemByKey(){
