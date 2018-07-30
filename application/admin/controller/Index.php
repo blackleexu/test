@@ -2,8 +2,10 @@
 namespace app\admin\controller;
 
 use app\admin\model\User;
+use app\admin\model\Hobby;
 use app\admin\model\Login;
-use app\admin\model\Type;
+use app\admin\model\Department;
+use app\admin\model\Role;
 use think\Db;
 use think\Paginator;
 use think\Request;
@@ -12,22 +14,15 @@ use think\Session;
 class Index extends BaseController
 {
     public function index(){
-        $data  = (new User())->getUserList();
+        $data  = User::getUserList();
         //爱好表查询
-        $hobby=Db::table('hobby')->select();
-        //用户表爱好id转对应的爱好名
-        for ($i=0;$i<count($data);$i++){
-            $tmp=explode(",",$data[$i]['hobby']);
-            $data[$i]['hobby']='';
-            for ($j=0;$j<count($tmp);$j++){
-//                $data[$i]['hobby'].=$hobby[intval($data[$i]['hobby'][$j])];
-                $data[$i]['hobby'].=$hobby[intval($tmp[$j])-1]['hobby'].',';
-            }
-            $data[$i]['hobby']=substr($data[$i]['hobby'],0,strlen($data[$i]['hobby'])-1);
-        }
-
-        $department=Db::table('department')->select();
-        $role=Db::table('role')->select();
+        $hobby=Hobby::all();
+        //根据爱好id获取对应的爱好名
+        Hobby::hobby_convert($data,$hobby);
+        //部门查询
+        $department=User::getDepartmentList();
+        //角色查询
+        $role=Role::all();
 
         $this->assign('user',$data);
         $this->assign('department',$department);
@@ -123,13 +118,9 @@ class Index extends BaseController
 
     public function userUpdate(){
         $data=input("param.");
-        $str='';
-        for($i=0;$i<count($data['hobby']);$i++){
-            $str.=$data['hobby'][$i].",";
-        }
-        $data['hobby']=substr($str,0,strlen($str)-1);
-//        dump($data);
-//        die();
+
+        $data['hobby']=Hobby::hobby_format_before_update($data);
+
         $user=new User();
         $result=$user->validate(true)->save($data,['uid'=>$data['uid']]);
         if(!$result){
@@ -142,58 +133,21 @@ class Index extends BaseController
     }
 
     public function getDepartmentList(){
-        $result=[];
-        $children=[];
-        $department_list_arr=Db::table('department')->select();
-
-        $result[0]['name']='部门';
-        for ($i=0;$i<count($department_list_arr);$i++){
-            $children[$i]['name'] = $department_list_arr[$i]['department'];
-            $children[$i]['id'] = $department_list_arr[$i]['did'];
-        }
-        $result[0]['children']=$children;
-        $result[0]['spread']=true;
-        return $result;
-//        return json_encode($result);
+        $department_list_arr=Department::all();
+        return User::tree_item_click($department_list_arr,'did','department',true);
     }
 
     public function getRoleList(){
-        $result=[];
-        $children=[];
-        $role_list_arr=Db::table('role')->select();
-
-        $result[0]['name']='职位';
-        for ($i=0;$i<count($role_list_arr);$i++){
-            $children[$i]['name'] = $role_list_arr[$i]['rolename'];
-            $children[$i]['id'] = $role_list_arr[$i]['rid'];
-        }
-        $result[0]['children']=$children;
-        return $result;
-    }
-
-    public function array_to_json(array $arr){
-        $result=[];
-        for ($i=0;$i<count($arr);$i++){
-            $result[$i]['name'] = $arr[$i]['department'];
-            $result[$i]['id'] = $arr[$i]['did'];
-        }
-        return json_encode($result);
+        $role_list_arr=Role::all();
+        return User::tree_item_click($role_list_arr,'rid','rolename',true);
     }
 
     public function getItemByKey(){
         $data  = (new User())->getUserList();
         //爱好表查询
-        $hobby=Db::table('hobby')->select();
+        $hobby=Hobby::all();
         //用户表爱好id转对应的爱好名
-        for ($i=0;$i<count($data);$i++){
-            $tmp=explode(",",$data[$i]['hobby']);
-            $data[$i]['hobby']='';
-            for ($j=0;$j<count($tmp);$j++){
-//                $data[$i]['hobby'].=$hobby[intval($data[$i]['hobby'][$j])];
-                $data[$i]['hobby'].=$hobby[intval($tmp[$j])-1]['hobby'].',';
-            }
-            $data[$i]['hobby']=substr($data[$i]['hobby'],0,strlen($data[$i]['hobby'])-1);
-        }
+        Hobby::hobby_convert($data,$hobby);
         return $data;
     }
 }

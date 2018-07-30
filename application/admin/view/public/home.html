@@ -20,7 +20,7 @@
     <!-- TABLE STYLES-->
     <link href="__STATIC__/admin/assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet" />
     <!--<link href="__STATIC__/layer/theme/default/layer.css" rel="stylesheet" />-->
-    <link href="__STATIC__/layer/layui.css" rel="stylesheet" />
+    <link href="__STATIC__/admin/layui/css/layui.css" rel="stylesheet" />
 
     <style>
         a{
@@ -108,9 +108,9 @@
 <script src="__STATIC__/admin/assets/js/jquery.ztree.all.js"></script>
 <!--<script src="__STATIC__/admin/assets/js/custom-scripts.js"></script>-->
 <!--<script src="__STATIC__/admin/assets/js/custom.js"></script>-->
-<script src="__STATIC__/layer/layer.js"></script>
+<script src="__STATIC__/admin/layui/lay/layer.js"></script>
 <!--<script src="__STATIC__/layer/layui.js"></script>-->
-<script src="__STATIC__/layer/layui.all.js"></script>
+<script src="__STATIC__/admin/layui/layui.all.js"></script>
 <!---->
 <script>
     //Demo
@@ -126,60 +126,63 @@
                         ,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
                         ,click: function(item){ //点击节点回调
                             var key=item.name;
-                            // if(empty(item.id)){
-                            //     key='';
-                            // }
-                            $.post("{:url('admin/getitem')}",{'departmentkey':key},function (data) {
-                                $("#usertable").empty();
+                            if(typeof item.id!="undefined"){
+                                // key='';
+                                $.post("{:url('admin/getitem')}",{'click_department_key':key},function (data) {
+                                    $("#usertable").empty();
+                                    // alert(item.name);
 
-                                var dom="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
-                            dom+="<thead>";
-                                dom+="<tr>";
-                                dom+="<th>ID</th>";
-                                dom+="<th>用户名</th>";
-                                dom+="<th>部门</th>";
-                                dom+="<th>角色</th>";
-                                dom+="<th>爱好</th>";
-                                dom+="<th>操作</th>";
-                                dom+="<th>操作</th>";
-                                dom+="</tr>";
-                                dom+="</thead>";
-                                dom+="</tbody>";
-                                if(data.length>0){
-                                    // $.each(data,function(i,user){
-                                    //     var row=$("#template").clone();
-                                    //     row.css('display','block');
-                                    //     row.find("#template_uid").text(user.uid);
-                                    //     row.find("#template_uname").text(user.uname);
-                                    //     row.find("#template_department").text(user.department);
-                                    //     row.find("#template_role").text(user.rolename);
-                                    //     row.find("#template_hobby").text(user.hobby);
-                                    //     row.find("#template_update").onclick('jsedit('+user.uid+')');
-                                    //     row.find("#template_del").onclick('userdel('+user.uid+')');
-                                    //
-                                    //     row.appendTo($("#usertable"));
-                                    // });
-                                    // alert(data[0]['uid']);
-                                    for(var i=0;i<data.length;i++){
-                                        // dom+="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
-                                        dom+="<tr class=\"odd gradeX\">";
-                                        dom+="<td>"+data[i].uid+"</td>";
-                                        dom+="<td>"+data[i].uname+"</td>";
-                                        dom+="<td>"+data[i].department+"</td>";
-                                        dom+="<td>"+data[i].rolename+"</td>";
-                                        dom+="<td>"+data[i].hobby+"</td>";
-                                        dom+="<td><a href=\"javascript:;\" data-toggle=\"modal\" data-target=\"#update_dialog\" onclick=\"jsedit("+data[i].uid+")\"><button type=\"button\" class=\"btn btn-primary\">修改</button></a></td>";
-                                        dom+="<td><a href=\"javascript:;\"><button type=\"button\" class=\"btn btn-danger\" onclick=\"userdel("+data[i].uid+")\">删除</button></a></td>";
-                                        dom+="</tr>";
-                                    }
-                                    // alert(dom);
-                                }else(
-                                    layer.msg('当前节名称：'+ item.name)
-                                );
-                                dom+="</tbody> </table>"
-                                $("#usertable").append(dom);
-                                // dom.html($("#usertable"));
-                            });
+
+                                    var dom="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
+                                    dom+="<thead>";
+                                    dom+="<tr>";
+                                    dom+="<th>ID</th>";
+                                    dom+="<th>用户名</th>";
+                                    dom+="<th>部门</th>";
+                                    dom+="<th>角色</th>";
+                                    dom+="<th>爱好</th>";
+                                    dom+="<th>操作</th>";
+                                    dom+="<th>操作</th>";
+                                    dom+="</tr>";
+                                    dom+="</thead>";
+                                    dom+="</tbody>";
+                                    if(data.length>0){
+                                        // $.each(data,function(i,user){
+                                        //     var row=$("#template").clone();
+                                        //     row.css('display','block');
+                                        //     row.find("#template_uid").text(user.uid);
+                                        //     row.find("#template_uname").text(user.uname);
+                                        //     row.find("#template_department").text(user.department);
+                                        //     row.find("#template_role").text(user.rolename);
+                                        //     row.find("#template_hobby").text(user.hobby);
+                                        //     row.find("#template_update").onclick('jsedit('+user.uid+')');
+                                        //     row.find("#template_del").onclick('userdel('+user.uid+')');
+                                        //
+                                        //     row.appendTo($("#usertable"));
+                                        // });
+                                        // alert(data[0]['uid']);
+                                        for(var i=0;i<data.length;i++){
+                                            // dom+="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
+                                            dom+="<tr class=\"odd gradeX\">";
+                                            dom+="<td>"+data[i].uid+"</td>";
+                                            dom+="<td>"+data[i].uname+"</td>";
+                                            dom+="<td>"+data[i].department+"</td>";
+                                            dom+="<td>"+data[i].rolename+"</td>";
+                                            dom+="<td>"+data[i].hobby+"</td>";
+                                            dom+="<td><a href=\"javascript:;\" data-toggle=\"modal\" data-target=\"#update_dialog\" onclick=\"jsedit("+data[i].uid+")\"><button type=\"button\" class=\"btn btn-primary\">修改</button></a></td>";
+                                            dom+="<td><a href=\"javascript:;\"><button type=\"button\" class=\"btn btn-danger\" onclick=\"userdel("+data[i].uid+")\">删除</button></a></td>";
+                                            dom+="</tr>";
+                                        }
+                                        // alert(dom);
+                                    }else(
+                                        dom="<p>暂无相关信息</p>"
+                                    );
+                                    dom+="</tbody> </table>"
+                                    $("#usertable").append(dom);
+                                    // dom.html($("#usertable"));
+                                });
+                            }
+
                        }
                         ,nodes: data
                     });
@@ -195,8 +198,48 @@
                     elem: '#demo2' //指定元素
                     ,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
                     ,click: function(item){ //点击节点回调
-                        layer.msg('当前节名称：'+ item.name + '<br>全部参数：'+ JSON.stringify(item));
-                        console.log(item);
+                        var key=item.name;
+                        if(typeof item.id==="undefined"){
+                            key='';
+                        }
+                        $.post("{:url('admin/getitem')}",{'click_role_key':key},function (data) {
+                            $("#usertable").empty();
+                            // alert(key);
+
+                            var dom="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
+                            dom+="<thead>";
+                            dom+="<tr>";
+                            dom+="<th>ID</th>";
+                            dom+="<th>用户名</th>";
+                            dom+="<th>部门</th>";
+                            dom+="<th>角色</th>";
+                            dom+="<th>爱好</th>";
+                            dom+="<th>操作</th>";
+                            dom+="<th>操作</th>";
+                            dom+="</tr>";
+                            dom+="</thead>";
+                            dom+="</tbody>";
+                            if(data.length>0){
+                                for(var i=0;i<data.length;i++){
+                                    // dom+="<table class=\"table table-striped table-bordered table-hover\" id=\"dataTables-example\">";
+                                    dom+="<tr class=\"odd gradeX\">";
+                                    dom+="<td>"+data[i].uid+"</td>";
+                                    dom+="<td>"+data[i].uname+"</td>";
+                                    dom+="<td>"+data[i].department+"</td>";
+                                    dom+="<td>"+data[i].rolename+"</td>";
+                                    dom+="<td>"+data[i].hobby+"</td>";
+                                    dom+="<td><a href=\"javascript:;\" data-toggle=\"modal\" data-target=\"#update_dialog\" onclick=\"jsedit("+data[i].uid+")\"><button type=\"button\" class=\"btn btn-primary\">修改</button></a></td>";
+                                    dom+="<td><a href=\"javascript:;\"><button type=\"button\" class=\"btn btn-danger\" onclick=\"userdel("+data[i].uid+")\">删除</button></a></td>";
+                                    dom+="</tr>";
+                                }
+                                // alert(dom);
+                            }else(
+                                dom="<p style=\'margin: 0 auto;width: 100%\'>暂无相关信息</p>"
+                            );
+                            dom+="</tbody> </table>"
+                            $("#usertable").append(dom);
+                            // dom.html($("#usertable"));
+                        });
                     }
                     ,nodes: data
                 });
