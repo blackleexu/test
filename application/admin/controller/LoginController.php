@@ -25,7 +25,6 @@ class LoginController extends Controller
                 $result=$login->login($aname,$adminpass);
                 if($result==1){
                     Session::set('message','密码有误');
-
                 }else if($result==2){
                     Session::set('message','用户不存在');
                 }else{
@@ -33,7 +32,7 @@ class LoginController extends Controller
                 }
             }
         }
-        return $this->fetch('index/index');
+        return $this->fetch('index/login');
     }
     public function show_captcha(){
         ob_clean();

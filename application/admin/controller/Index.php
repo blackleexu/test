@@ -26,7 +26,7 @@ class Index extends BaseController{
         $this->assign('role',$role);
         $this->assign('hobby',$hobby);
 
-        return $this->fetch('index/empty');
+        return $this->fetch('index/index');
     }
 
     public function edit(){

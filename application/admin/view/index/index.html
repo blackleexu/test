@@ -1,53 +1,628 @@
-<!DOCTYPE HTML>
+﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
-    <!-- Custom Theme files -->
-    <link href="__STATIC__/admin/assets/css/style.css" rel="stylesheet" type="text/css" media="all"/>
-    <!-- Custom Theme files -->
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="keywords" content="Login form web template, Sign up Web Templates, Flat Web Templates, Login signup Responsive web template, Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyErricsson, Motorola web design" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta content="" name="description"/>
+    <meta content="webthemez" name="author"/>
+    <title>Bootstrap HTML5 Admin Template</title>
+    <link rel="shortcut icon" type="image/x-icon" href="__STATIC__/favicon.ico"/>
+    <link href="__STATIC__/admin/assets/css/bootstrap.css" rel="stylesheet"/>
+    <!-- FontAwesome Styles-->
+    <link href="__STATIC__/admin/assets/css/font-awesome.css" rel="stylesheet"/>
+    <!-- Morris Chart Styles-->
+    <link href="__STATIC__/admin/assets/js/morris/morris-0.4.3.min.css" rel="stylesheet"/>
+    <!-- Custom Styles-->
+    <link href="__STATIC__/admin/assets/css/zTreeStyle/zTreeStyle.css" rel="stylesheet"/>
+    <link href="__STATIC__/admin/assets/css/custom-styles.css" rel="stylesheet"/>
+    <!-- Google Fonts-->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
+    <!-- TABLE STYLES-->
+    <link href="__STATIC__/admin/assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet"/>
+    <!--<link href="__STATIC__/layer/theme/default/layer.css" rel="stylesheet" />-->
+    <link href="__STATIC__/admin/layui/css/layui.css" rel="stylesheet"/>
+
     <style>
-        body{
-            background: url(__STATIC__/admin/assets/img/banner.jpg)repeat;
-            padding:100px 0px 30px 0px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 100%;
+        .layui-tree li i {
+            color: #f36a5a;
         }
+
+        .action_collect span label{
+            padding: 0;
+            text-align: right;
+            width: 5%;
+        }
+        .action_collect span .key{
+            width: 50%;
+        }
+
+        #menu{
+            width: 0; /*设置为0 隐藏自定义菜单*/
+            height: 125px;
+            overflow: hidden; /*隐藏溢出的元素*/
+            box-shadow: 0 1px 1px #888,1px 0 1px #ccc;
+            position: absolute; /*自定义菜单相对与body元素进行定位*/
+        }
+        .menu{
+            width: 130px;
+            height: 25px;
+            line-height: 25px;
+            padding: 0 10px;
+        }
+
     </style>
+    <!-- JS Scripts-->
+    <script src="__STATIC__/admin/assets/js/jquery-1.10.2.js"></script>
 </head>
-<body style="padding-top: 50px">
-<div class="login">
-    <h2>约健</h2>
-    <div class="login-top">
-        <h1>LOGIN FORM</h1>
-        <form method="post" action="">
-            <input type="text" name="Username"   onfocus="this.value = '';" required placeholder="Username" >
-            <input type="password" name="password"  onfocus="this.value = '';" required placeholder="Pass">
-            <!--<div>-->
-            <!--</div>   -->
-            <div class="control-group">
-                <div class="controls">
-                    <input class="btn-block" type="text" id="verifycode" placeholder="验证码" name="verifycode" autocomplete="off">
-                    <img src="{:url('show_captcha')}" alt="captcha" onclick="this.src=this.src"+'?' />
+<body>
+<div id="wrapper">
+    <nav class="navbar navbar-default top-navbar" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="url('admin/index')"><strong><i class="icon fa fa-plane"></i> 管理员端</strong></a>
+            <div id="sideNav" href="">
+                <i class="fa fa-bars icon"></i>
+            </div>
+        </div>
+
+        <ul class="nav navbar-top-links navbar-right">
+            <!-- /.dropdown -->
+            <li class="dropdown">
+                <!--{{&#45;&#45;时钟&#45;&#45;}}-->
+                <div id="txt"></div>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                    <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-user">
+                    <li><a href="{:url('admin/logout')}"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                    </li>
+                </ul>
+                <!-- /.dropdown-user -->
+            </li>
+            <!-- /.dropdown -->
+        </ul>
+    </nav>
+    <!--/. NAV TOP  -->
+    <nav class="navbar-default navbar-side" role="navigation">
+        <div class="sidebar-collapse">
+            <ul class="nav" id="main-menu">
+            <li>
+            <a href="{:url('admin/index')}" class="<?php if(request()->path()=='admin/index') echo 'active-menu'; ?>"><i class="fa fa-dashboard"></i> 用户列表</a>
+            </li>
+            </ul>
+            <!--<ul id="treeDemo" class="ztree"></ul>-->
+            <!--<ul id="demo1"></ul>-->
+            <!--<ul id="demo2"></ul>-->
+        </div>
+    </nav>
+    <!-- /. NAV SIDE  -->
+    <div id="page-wrapper">
+        <div class="action_collect">
+            <h4 style="padding-left: 30px;padding-top: 2%">
+                <div class="panel-heading col-md-12" style="background:#f0ad4e;line-height: 34px;">
+                    <span>
+                        <label class="col-md-1 control-label">部门：</label>
+                        <div class="col-md-2">
+                            <select class="form-control" name="did" id="department_search_option" onchange="department_search_option()">
+                                {volist name="department" id="value"}
+                                <option value="{$value.did}">{$value.department}</option>
+                                {/volist}
+                            </select>
+                        </div>
+                    </span>
+                    <span>
+                        <label class="col-md-1 control-label">职位：</label>
+                        <div>
+                            <span class="col-md-2">
+                                <select class="form-control" name="rid" id="role_search_option" onchange="role_search_option()">
+                                    {volist name="role" id="value"}
+                                    <option value="{$value.rid}">{$value.rolename}</option>
+                                    {/volist}
+                                </select>
+                            </span>
+                        </div>
+                    </span>
+                    <span>
+                        <label class="col-md-1 control-label">搜索：</label>
+                        <div class="col-md-3">
+                            <form id="user_serach" action="{:url('admin/index')}" method="post">
+                            <input class="col-md-2 form-control key" type="text" id="search_key" name="key" placeholder="请输入关键字"  >
+                            <input type="hidden" name="click_department_key">
+                            <input type="hidden" name="click_role_key">
+                            <input type="hidden" name="page">
+                            <input type="button" id="submit" name="" value="提交" class="btn btn-default"onclick="search()">
+                        </form>
+                        </div>
+                    </span>
+                    <span class="col-md-2">
+                        <a href="#" data-toggle="modal" data-target="#add_dialog"
+                           style="float: right;color: #0C0C0C"><i class="fa fa-plus ">添加新用户</i></a>
+                    </span>
+                </div>
+            </h4>
+        </div>
+        <div id="page-inner" style="min-height: 600px">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Advanced Tables -->
+                    <div class="col-md-2" style="min-height: 600px;padding: 15px;">
+                        <div>
+                            <td class="control-label table table-striped table-bordered ">结构</td>
+                            <ul id="treeDemo" class="ztree"></ul>
+                            <ul id="demo1"></ul>
+                            <ul id="demo2"></ul>
+                        </div>
+                    </div>
+                        <div class="panel-body col-md-10">
+                            <div id="usertable">
+                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>用户名</th>
+                                        <th>部门</th>
+                                        <th>角色</th>
+                                        <th>爱好</th>
+                                        <th>操作</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <div id="usertable1">
+                                        {volist name='data_list' id='vo'}
+                                        <tr class="odd gradeX">
+                                            <td>{$vo.uid}</td>
+                                            <td>{$vo.uname|msubstr=0,5,'utf-8',true}</td>
+                                            <td>
+                                                <!--{$vo.department}-->
+                                                <select class="form-control" name="did" id="dp{$vo.uid}"
+                                                        onchange="departmentChange({$vo.uid})" style="width: 100%">
+                                                    {volist name="department" id="value"}
+                                                    <option value="{$value.did}" {$value.did==$vo.did?'selected':''}>
+                                                        {$value.department}
+                                                    </option>
+                                                    {/volist}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <!--{$vo.rolename}-->
+                                                <select class="form-control" name="rid" id="role{$vo.uid}"
+                                                        onchange="roleChange({$vo.uid})" style="width: 100%">
+                                                    {volist name="role" id="value"}
+                                                    <option value="{$value.rid}" {$value.rid==$vo.rid?'selected':''}>
+                                                        {$value.rolename}
+                                                    </option>
+                                                    {/volist}
+                                                </select>
+                                            </td>
+                                            <td>{$vo.hobby|msubstr=0,15,'utf-8',true}</td>
+                                            <td><a href="javascript:;" data-toggle="modal" data-target="#update_dialog"
+                                                   onclick="jsedit({$vo.uid})">
+                                                <button type="button" class="btn btn-primary">修改</button>
+                                            </a></td>
+                                            <td><a href="javascript:;"><button type="button" class="btn btn-danger"onclick="userdel({$vo.uid})">删除</button></a></td>
+                                        </tr>
+                                        {/volist}
+                                    </div>
+                                    </tbody>
+                                </table>
+                                <div style="float: right">
+                                    {$paginator->render()}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            {if(session('message'))}
-            <p style="text-align: center ;color:#F45B4B ">{$Think.session.message} </p>
-            {/if}
-            <div class="forgot">
-                <a href="#">forgot Password</a>
-                <input type="submit" value="Login" >
-            </div>
-        </form>
+        </div>
+        <div class="modal fade" id="update_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">修改用户信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!--<form id="user_update" class="form-horizontal" action="{:url('admin/userupdate')}" method="post" enctype="multipart/form-data">-->
+                        <form id="user_update" class="form-horizontal" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <input type="hidden" name="uid" id="uid">
+                                <label class="col-md-2 control-label">用户名</label>
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" id="uname" placeholder="用户名" name="uname">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">部门</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" name="did" id="department" style="width: 100%">
+                                        {volist name="department" id="value"}
+                                        <option value="{$value.did}" id="did">{$value.department}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">角色</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" name="rid" id="role">
+                                        {volist name="role" id="value"}
+                                        <option value="{$value.rid}" id="rid">{$value.rolename}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">爱好</label>
+                                <div class="col-md-10">
+                                    {volist name="hobby" id="vo"}
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="hobby[]" id="hobby{$vo.hid}" value="{$vo.hid}">
+                                        {$vo.hobby}
+                                    </label>
+                                    {/volist}
+                                </div>
+                            </div>
 
+                            <div class="modal-footer">
+                                <!--<input type="submit" name="" value="提交" class="btn btn-default">-->
+                                <input type="button" name="" value="提交" onclick="userupdate()" class="btn btn-default">
+                                <!--<input type="reset" name="" value="重置" class="btn btn-default">-->
+                                <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="add_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">添加用户信息</h4>
+                    </div>
+                    <div class="modal-body">
+                        <!--<form class="form-horizontal" action="{:url('admin/useradd')}" method="post" enctype="multipart/form-data">-->
+                        <form id="user_add" class="form-horizontal" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">用户名</label>
+                                <div class="col-md-10">
+                                    <input type="text" class="form-control" value="" placeholder="用户名" name="uname"
+                                           autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">密码</label>
+                                <div class="col-md-10">
+                                    <input type="password" class="form-control" value="" placeholder="密码"
+                                           name="password" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">部门</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" name="did" style="width: 100%">
+                                        {volist name="department" id="value"}
+                                        <option value="{$value.did}">{$value.department}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">角色</label>
+                                <div class="col-md-10">
+                                    <select class="form-control" name="rid">
+                                        {volist name="role" id="value"}
+                                        <option value="{$value.rid}">{$value.rolename}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-2 control-label">爱好</label>
+                                <div class="col-md-10">
+                                    {volist name="hobby" id="vo"}
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="hobby[]" value="{$vo.hid}"> {$vo.hobby}
+                                    </label>
+                                    {/volist}
+                                </div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <input type="button" name="" value="提交" onclick="useradd()" class="btn btn-default">
+                                <!--<input type="reset" name="" value="重置" class="btn btn-default">-->
+                                <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    <div id="menu">
+        <div class="menu">功能1</div>
+        <div class="menu">功能2</div>
+        <div class="menu">功能3</div>
+        <div class="menu">功能4</div>
+        <div class="menu">功能5</div>
     </div>
-    <div class="login-bottom">
-        <h3>New User &nbsp;<a href="#">Register</a>&nbsp Here</h3>
     </div>
 </div>
+<!-- Bootstrap Js -->
+<script src="__STATIC__/admin/assets/js/bootstrap.min.js"></script>
+<!-- Metis Menu Js -->
+<script src="__STATIC__/admin/assets/js/jquery.metisMenu.js"></script>
+<script src="__STATIC__/admin/assets/js/morris/raphael-2.1.0.min.js"></script>
+<!-- DATA TABLE SCRIPTS -->
+<script src="__STATIC__/admin/assets/js/dataTables/jquery.dataTables.js"></script>
+<script src="__STATIC__/admin/assets/js/dataTables/dataTables.bootstrap.js"></script>
+<script src="__STATIC__/admin/assets/js/jquery.ztree.all.js"></script>
+<script src="__STATIC__/admin/layui/layui.all.js"></script>
+<!---->
+<script>
+    $(document).ready(function () {
+    //     var zTreeObj;
+    //     var setting = {
+    //         view:{
+    //             showLine:false,
+    //             showIcon:false
+    //         },
+    //         callback:{
+    //             onClick:onClick,
+    //             beforeExpand: beforeExpand,
+    //             onExpand: onExpand
+    //         },
+    //         async: {
+    //             enable: true,//开启异步
+    //             url: "./package.json",
+    //             type:"get",
+    //             autoParam: ["tId"],//数据传递，tId是系统自动生成的当前树枝的id，此处也可以换成自己设置的属性，比如“ename”，那么传递的数据就是ename=one
+    //             dataFilter:filter//对返回值进行操作
+    //         }
+    //     };
+    //
+    //     var zNodes = [{ id:1, pId:0, name:"父节点 1", open:true,noRemoveBtn:true,noEditBtn:true},
+    //         { id:11, pId:1, name:"叶子节点 1-1",noRemoveBtn:true,noEditBtn:true},
+    //         { id:12, pId:1, name:"叶子节点 1-2"},
+    //         { id:13, pId:1, name:"叶子节点 1-3"},
+    //         { id:2, pId:0, name:"父节点 2", open:true},
+    //         { id:21, pId:2, name:"叶子节点 2-1"},
+    //         { id:22, pId:2, name:"叶子节点 2-2"},
+    //         { id:23, pId:2, name:"叶子节点 2-3"},
+    //         { id:3, pId:0, name:"父节点 3", open:true},
+    //         { id:31, pId:3, name:"叶子节点 3-1"},
+    //         { id:32, pId:3, name:"叶子节点 3-2"},
+    //         { id:33, pId:3, name:"叶子节点 3-3"}
+    // ];
+    //
+    //     $(document).ready(function(){
+    //         $.post("{:url('admin/getdepartment')}",{},function (data){
+    //             zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
+    //         });
+    //
+    //     });
+    //     function onClick() {
+    //
+    //     }
+    //     function beforeExpand() {
+    //
+    //     }
+    //     function onExpand() {
+    //
+    //     }
+    //     function filter() {
+    //
+    //     }
+    //     var setting = {
+    //         data: {
+    //             simpleData: {
+    //                 enable: true,
+    //                 idKey: "id",
+    //                 pIdKey: "pId",
+    //                 rootPId: 0
+    //             }
+    //         }
+    //     };
+    //     var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+    // alert(nodes);
 
+$.post("{:url('admin/getdepartment')}", {}, function (data) {
+            layui.use(['tree', 'layer'], function () {
+                var layer = layui.layer
+                    , $ = layui.jquery;
+
+                layui.tree({
+                    elem: '#demo1' //指定元素
+                    , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+                    , click: function (item) { //点击节点回调
+                        var key = item.name;
+                        if (typeof item.id != "undefined") {
+                            $('#user_serach input[name=click_department_key]').val(key);
+                            // $('#user_serach input[name=click_role_key]').val('');
+                            // $('#user_serach input[name=key]').val('');
+                            search();
+                        } else {
+                            $('#user_serach input[name=click_role_key]').val('');
+                            $('#user_serach input[name=click_department_key]').val('');
+                            $('#user_serach input[name=key]').val('');
+                            search();
+                        }
+                    }
+                    , nodes: data
+                });
+            });
+        });
+        $.post("{:url('admin/getrole')}", {}, function (data) {
+            layui.use(['tree', 'layer'], function () {
+                var layer = layui.layer
+                    , $ = layui.jquery;
+
+                layui.tree({
+                    elem: '#demo2' //指定元素
+                    , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+                    , click: function (item) { //点击节点回调
+                        var key = item.name;
+                        if (typeof item.id != "undefined") {
+                            // $('#user_serach input[name=click_department_key]').val('');
+                            // $('#user_serach input[name=key]').val('');
+                            $('#user_serach input[name=click_role_key]').val(key);
+                            search();
+                        } else {
+                            $('#user_serach input[name=click_role_key]').val('');
+                            $('#user_serach input[name=click_department_key]').val('');
+                            $('#user_serach input[name=key]').val('');
+                            search();
+                        }
+                    }
+                    , nodes: data
+                });
+            });
+        });
+    });
+
+    $("body").delegate(".my_page_class", "click", function () {
+        var page = $(this).html();
+        $('#user_serach input[name=page]').val(page);
+        search();
+    });
+
+    function jsedit(uid) {
+        //从数据库中根据tid获取记录
+        $.getJSON(
+            "{:url('admin/edit')}", {"uid": uid}, function (json) {
+                $("#uid").val(json.uid);
+                $("#uname").val(json.uname);
+                $("#department").val(json.did);
+                $("#role").val(json.rid);
+                var checkbox = $('#hobby1').children("input");
+                for (i = 1; i <= json.count; i++) {
+                    $("#hobby" + i).prop("checked", false);
+                    if (json.hobby.indexOf('' + i) != -1)
+                        $("#hobby" + i).prop("checked", true);
+                }
+            });
+    }
+
+    function userupdate() {
+        var form = $("#user_update").serialize();
+        $.post("{:url('admin/userupdate')}", form, function (data) {
+            console.log(data);
+            $('.modal').map(function () {
+                if (!$(this).is(":hidden")) {
+                    $(this).modal('hide');
+                }
+            });
+            if (typeof data.status == 0) {
+                layer.msg(data.msg, {icon: 6, time: 500});
+            } else {
+                layer.msg('修改成功', {icon: 6, time: 500});
+                search();
+            }
+        })
+    }
+
+    function useradd() {
+        var form = $("#user_add").serialize();
+        $.post("{:url('admin/useradd')}", form, function (data) {
+            console.log(data);
+            $('.modal').map(function () {
+                if (!$(this).is(":hidden")) {
+                    $(this).modal('hide');
+                }
+            });
+            if (typeof data.status == 0) {
+                layer.msg(data.msg, {icon: 5, time: 500});
+            } else {
+                layer.msg('添加成功', {icon: 6, time: 500});
+                search();
+            }
+        })
+    }
+
+    function search() {
+        $.post("{:url('admin/index')}", $('#user_serach').serialize(), function (data) {
+            $('#usertable').html($(data).find('#usertable').html());
+        });
+    }
+
+    $("#search_key").keydown(function (event) {
+        if (event.keyCode == "13") {
+            search();
+            return false;
+        }
+    });
+
+    function userdel(id) {
+        layer.confirm('确认删除', {btn: ['确认', '取消']},
+            function () {
+                $.post("{:url('admin/userdel')}", {"uid": id}, function (data) {
+                    // alert(data.msg);
+                    if (data.status == 0) {
+                        // location.href=location.href;//刷新页面
+                        layer.msg(data.msg, {icon: 6, time: 500});
+                        search();
+                    } else {
+                        layer.msg(data.msg, {icon: 5, time: 500});
+                    }
+                });
+            }, function () {
+            });
+    }
+
+    function departmentChange(id) {
+        //获取当前选择的option
+        var position = "#dp" + id;
+        var did = $(position).children('option:selected').val();
+        $.post("{:url('admin/dpchange')}", {"uid": id, "did": did}, function (data) {
+            if (data.status == 1) {
+                layer.msg(data.msg, {icon: 6, time: 500});
+            } else {
+                layer.msg(data.msg, {icon: 5, time: 500});
+            }
+        })
+    }
+
+    function roleChange(id) {
+        //获取当前选择的option
+        var position = "#role" + id;
+        var rid = $(position).children('option:selected').val();
+        $.post("{:url('admin/rolechange')}", {"uid": id, "rid": rid}, function (data) {
+            if (data.status == 1) {
+                layer.msg(data.msg, {icon: 6, time: 500},);
+            } else {
+                layer.msg(data.msg, {icon: 5, time: 500})
+            }
+        })
+    }
+
+    function role_search_option() {
+        var rid=$("#role_search_option").children('option:selected').text();
+        // alert(rid);
+        $('#user_serach input[name=click_role_key]').val(rid);
+    }
+
+    function department_search_option() {
+        var did=$("#department_search_option").children('option:selected').text();
+        // alert(did);
+        $('#user_serach input[name=click_role_key]').val(did);
+    }
+</script>
 </body>
 </html>
+
+
+
+

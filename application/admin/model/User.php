@@ -46,7 +46,7 @@ class User extends Model{
             $user_search->where('rolename','like','%'.$click_role_key.'%');
         }
 
-        return $user_search->paginate(2,false,[
+        return $user_search->paginate(8,false,[
             'query' => $query
         ]);
     }
