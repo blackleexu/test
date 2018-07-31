@@ -16,7 +16,6 @@ class LoginController extends Controller
             //用验证器验证
             if(!captcha_check($captcha)){
                 //验证失败
-//                echo "<script>alter('密码有误');</script>";
                 Session::set('message','验证码有误');
             }else{
                 $aname=input('Username');
@@ -25,11 +24,9 @@ class LoginController extends Controller
                 $login=new Login();
                 $result=$login->login($aname,$adminpass);
                 if($result==1){
-//                    echo "<script>alter('密码有误');</script>";
                     Session::set('message','密码有误');
 
                 }else if($result==2){
-//                    echo "<script>alter('用户不存在');</script>";
                     Session::set('message','用户不存在');
                 }else{
                     $this->redirect('admin/index');
