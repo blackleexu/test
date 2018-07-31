@@ -94,28 +94,26 @@ class Index extends BaseController{
     public function userAdd(Request $request){
         $data= $request->post();
         $data['password']=md5($data['password']);
-
-        $str='';
-        for($i=0;$i<count($data['hobby']);$i++){
-            $str.=$data['hobby'][$i].",";
+        if(isset($data['hobby'])){
+            $data['hobby']=Hobby::hobby_format_before_update($data);
         }
-        $data['hobby']=substr($str,0,strlen($str)-1);
 
         //获取数据列数
         $model=new User();
         $result=$model->validate(true)->save($data);
-
-        if($result){
-            Session::flash('usersuccess',"添加成功");
-            $this->redirect('admin/index');
+        if(!$result){
+            return $update_result=[
+                'status'=>0,
+                'msg'=>'修改失败'
+            ];
         }else{
-            Session::flash('usererror',$model->getError());
             $this->redirect('admin/index');
         }
     }
 
     public function userUpdate(){
         $data=input("param.");
+
         $data['hobby']=Hobby::hobby_format_before_update($data);
         $user=new User();
         $result=$user->validate(true)->save($data,['uid'=>$data['uid']]);
@@ -124,15 +122,8 @@ class Index extends BaseController{
                 'status'=>0,
                 'msg'=>'修改失败'
             ];
-//            $this->redirect('admin/index');
-//            $this->index();
         }else{
-//            return $update_result=[
-//                'status'=>1,
-//                'msg'=>'修改成功'
-//            ];
             $this->redirect('admin/index');
-//            $this->index();
         }
     }
 

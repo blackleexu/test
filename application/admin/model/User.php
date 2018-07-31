@@ -3,6 +3,7 @@ namespace app\admin\model;
 
 use think\Db;
 use think\Model;
+use think\Session;
 use traits\model\SoftDelete;
 
 class User extends Model{
@@ -14,6 +15,8 @@ class User extends Model{
     protected $updateTime='update_at';
     protected $deleteTime = 'delete_at';
 
+//    public static $key='';
+
     /**
      * @return \think\Paginator
      * @throws \think\exception\DbException
@@ -22,6 +25,7 @@ class User extends Model{
         $key = input('param.key','');
         $click_department_key=input('param.click_department_key');
         $click_role_key=input('param.click_role_key');
+
         $user_search = Db::table('user')
             ->alias('user')
             ->join('department dpment','user.did=dpment.did')
@@ -30,20 +34,21 @@ class User extends Model{
 
         $user_search->whereNull('delete_at');
 
+        $query = array_merge($_GET,$_POST);
+
         if(trim($key)){
             $user_search->where('uname','like','%'.$key.'%');
-            return $user_search->paginate(5,false,['query'=>['key'=>$key]]);
         }
         if(trim($click_department_key)!=''){
             $user_search->where('department','like','%'.$click_department_key.'%');
-            return $user_search->paginate(5,false,['query'=>['click_department_key'=>$click_department_key]]);
         }
         if(trim($click_role_key)!=''){
             $user_search->where('rolename','like','%'.$click_role_key.'%');
-            return $user_search->paginate(5,false,['query'=>['click_role_key'=>$click_role_key]]);
         }
 
-        return $user_search->paginate(5);
+        return $user_search->paginate(2,false,[
+            'query' => $query
+        ]);
     }
 
     /**

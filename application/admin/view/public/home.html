@@ -34,7 +34,8 @@
         }
 
     </style>
-
+    <!-- JS Scripts-->
+    <script src="__STATIC__/admin/assets/js/jquery-1.10.2.js"></script>
 </head>
 <body>
 <div id="wrapper">
@@ -94,8 +95,6 @@
         {__CONTENT__}
     </div>
 </div>
-<!-- JS Scripts-->
-<script src="__STATIC__/admin/assets/js/jquery-1.10.2.js"></script>
 <!-- Bootstrap Js -->
 <script src="__STATIC__/admin/assets/js/bootstrap.min.js"></script>
 <!-- Metis Menu Js -->
@@ -126,12 +125,9 @@
                     ,click: function(item){ //点击节点回调
                         var key=item.name;
                         if(typeof item.id!="undefined"){
-                            $.post("{:url('admin/index')}",{'click_department_key':key},function (html_data) {
-
-                                $('#usertable').html($(html_data).find('#usertable').html());
-                                $('#key_name').val("{:session('key_name')}");
-                                $('#key_value').val("{:session('key')}");
-                            });
+                            $('#user_serach input[name=click_department_key]').val(key);
+                            $('#user_serach input[name=click_role_key]').val('');
+                            search();
                         }
                     }
                     ,nodes: data
@@ -149,12 +145,10 @@
                     ,click: function(item){ //点击节点回调
                         var key=item.name;
                         if(typeof item.id!="undefined"){
-                            $.post("{:url('admin/index')}",{'click_role_key':key},function (html_data) {
-
-                                $('#usertable').html($(html_data).find('#usertable').html());
-                                $('#key_name').val("{:session('key_name')}");
-                                $('#key_value').val("{:session('key')}");
-                            });
+                            $('#user_serach input[name=click_department_key]').val('');
+                            // $('#user_serach input[name=click_role_key]').val('');
+                            $('#user_serach input[name=click_role_key]').val(key);
+                            search();
                         }
                     }
                     ,nodes: data
@@ -163,7 +157,11 @@
         });
     });
 
-
+    $("body").delegate(".my_page_class","click",function(){
+        var page = $(this).html();
+        $('#user_serach input[name=page]').val(page);
+        search();
+    });
 </script>
 <!--<script>-->
 

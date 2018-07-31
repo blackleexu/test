@@ -25,11 +25,14 @@
                 {/if}
 
                 <div class="panel-heading">
-                    <!--<form class="form-horizontal" action="{:url('admin/index')}" method="post" enctype="multipart/form-data" style="margin: 0 auto">-->
+                    <form id="user_serach" action="{:url('admin/index')}" method="post" >
                         <lable class="control-label col-md-1">搜索</lable>
                         <input class="col-md-2 form-control" type="text" id="search_key" name="key"  placeholder="请输入关键字" autocomplete="off" style="width: 30%;">
+                        <input type="hidden" name="click_department_key" >
+                        <input type="hidden" name="click_role_key" >
+                        <input type="hidden" name="page">
                         <input type="button" id="submit" name="" value="提交" class="btn btn-default" onclick="search()">
-                    <!--</form>-->
+                    </form>
                     <a href="#"  data-toggle="modal" data-target="#add_dialog" style="float: right;color: #0C0C0C"><i class="fa fa-plus ">New Classification</i></a>
                 </div>
                 <div class="panel-body">
@@ -104,6 +107,8 @@
                 <!--<form id="user_update" class="form-horizontal" action="{:url('admin/userupdate')}" method="post" enctype="multipart/form-data">-->
                 <form id="user_update" class="form-horizontal" method="post" enctype="multipart/form-data">
                     <div class="form-group">
+                        <!--<input type="hidden" id="key_name"  name="key_name"  value="">-->
+                        <!--<input type="hidden" id="key_value" name="key_value"  value="">-->
                         <input type="hidden" name="uid" id="uid">
                         <label class="col-md-2 control-label">用户名</label>
                         <div class="col-md-10">
@@ -160,7 +165,8 @@
                 <h4 class="modal-title">添加用户信息</h4>
             </div>
             <div class="modal-body">
-                <form class="form-horizontal" action="{:url('admin/useradd')}" method="post" enctype="multipart/form-data">
+                <!--<form class="form-horizontal" action="{:url('admin/useradd')}" method="post" enctype="multipart/form-data">-->
+                <form id="user_add" class="form-horizontal" method="post" enctype="multipart/form-data">
                     <div class="form-group">
                         <label class="col-md-2 control-label">用户名</label>
                         <div class="col-md-10">
@@ -205,7 +211,7 @@
                     </div>
 
                     <div class="modal-footer">
-                        <input type="submit" name="" value="提交" class="btn btn-default">
+                        <input type="button" name="" value="提交" onclick="useradd()" class="btn btn-default" >
                         <!--<input type="reset" name="" value="重置" class="btn btn-default">-->
                         <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭</button>
                     </div>
@@ -226,7 +232,6 @@
                 $("#department").val(json.did);
                 $("#role").val(json.rid);
                 var checkbox = $('#hobby1').children("input");
-                // alert(json.hobby);
                 for (i = 1; i <=json.count; i++) {
                     $("#hobby" + i).prop("checked", false);
                     if (json.hobby.indexOf('' + i)!=-1)
@@ -235,12 +240,9 @@
             });
     }
 
-
-
     function userupdate() {
         var form =  $("#user_update").serialize();
         $.post("{:url('admin/userupdate')}",form,function (data) {
-            // alert(data.status);
             console.log(data);
             $('.modal').map(function () {
                 if (!$(this).is(":hidden")){
@@ -250,14 +252,32 @@
             if(typeof data.status==0) {
                 layer.msg(data.msg,{icon:6,time:500});
             }else{
-                $('#usertable').html($(data).find('#usertable').html());
+                layer.msg('修改成功',{icon:6,time:500});
+                search();
+            }
+        })
+    }
+
+    function useradd() {
+        var form =  $("#user_add").serialize();
+        $.post("{:url('admin/useradd')}",form,function (data) {
+            console.log(data);
+            $('.modal').map(function () {
+                if (!$(this).is(":hidden")){
+                    $(this).modal('hide');
+                }
+            });
+            if(typeof data.status==0) {
+                layer.msg(data.msg,{icon:5,time:500});
+            }else{
+                layer.msg('添加成功',{icon:6,time:500});
+                search();
             }
         })
     }
 
     function search() {
-        var key = $("#search_key").val();
-        $.post("{:url('admin/index')}",{'key':key},function (data) {
+        $.post("{:url('admin/index')}",$('#user_serach').serialize(),function (data) {
             $('#usertable').html($(data).find('#usertable').html());
         });
     }
@@ -268,16 +288,15 @@
         }
     });
 
-
-
     function userdel(id) {
         layer.confirm('确认删除',{btn:['确认','取消']},
             function () {
                 $.post("{:url('admin/userdel')}",{"uid":id},function (data) {
                     // alert(data.msg);
                     if(data.status==0){
-                        location.href=location.href;//刷新页面
+                        // location.href=location.href;//刷新页面
                         layer.msg(data.msg,{icon:6,time:500});
+                        search();
                     }else{
                         layer.msg(data.msg,{icon:5,time:500});
                     }
