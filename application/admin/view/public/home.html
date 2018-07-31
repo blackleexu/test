@@ -80,13 +80,13 @@
     <nav class="navbar-default navbar-side" role="navigation">
         <div class="sidebar-collapse">
             <!--<ul class="nav" id="main-menu">-->
-                <!--<li>-->
-                    <!--<a href="{:url('admin/index')}" class="<?php if(request()->path()=='admin/index') echo 'active-menu'; ?>"><i class="fa fa-dashboard"></i> 用户列表</a>-->
-                <!--</li>-->
+            <!--<li>-->
+            <!--<a href="{:url('admin/index')}" class="<?php if(request()->path()=='admin/index') echo 'active-menu'; ?>"><i class="fa fa-dashboard"></i> 用户列表</a>-->
+            <!--</li>-->
             <!--</ul>-->
             <ul id="treeDemo" class="ztree"></ul>
-                <ul id="demo1"></ul>
-                <ul id="demo2"></ul>
+            <ul id="demo1"></ul>
+            <ul id="demo2"></ul>
         </div>
     </nav>
     <!-- /. NAV SIDE  -->
@@ -120,19 +120,22 @@
                 var layer = layui.layer
                     ,$ = layui.jquery;
 
-                    layui.tree({
-                        elem: '#demo1' //指定元素
-                        ,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
-                        ,click: function(item){ //点击节点回调
-                            var key=item.name;
-                            if(typeof item.id!="undefined"){
-                                $.post("{:url('admin/index')}",{'click_department_key':key},function (html_data) {
-                                    $('#usertable').html($(html_data).find('#usertable').html());
-                                });
-                            }
-                       }
-                        ,nodes: data
-                    });
+                layui.tree({
+                    elem: '#demo1' //指定元素
+                    ,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+                    ,click: function(item){ //点击节点回调
+                        var key=item.name;
+                        if(typeof item.id!="undefined"){
+                            $.post("{:url('admin/index')}",{'click_department_key':key},function (html_data) {
+
+                                $('#usertable').html($(html_data).find('#usertable').html());
+                                $('#key_name').val("{:session('key_name')}");
+                                $('#key_value').val("{:session('key')}");
+                            });
+                        }
+                    }
+                    ,nodes: data
+                });
             });
         });
         $.post("{:url('admin/getrole')}",{},function (data){
@@ -147,7 +150,10 @@
                         var key=item.name;
                         if(typeof item.id!="undefined"){
                             $.post("{:url('admin/index')}",{'click_role_key':key},function (html_data) {
+
                                 $('#usertable').html($(html_data).find('#usertable').html());
+                                $('#key_name').val("{:session('key_name')}");
+                                $('#key_value').val("{:session('key')}");
                             });
                         }
                     }
@@ -161,67 +167,67 @@
 </script>
 <!--<script>-->
 
-    <!--var zTreeObj;-->
-    <!--// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）-->
-    <!--var setting = {-->
-        <!--view:{-->
-            <!--showLine:false,-->
-            <!--showIcon:false-->
-        <!--},-->
-        <!--callback:{-->
-            <!--onClick:onClick,-->
-            <!--beforeExpand: beforeExpand,-->
-            <!--onExpand: onExpand-->
-        <!--},-->
-        <!--async: {-->
-            <!--enable: true,//开启异步-->
-            <!--url: "./package.json",-->
-            <!--type:"get",-->
-            <!--autoParam: ["tId"],//数据传递，tId是系统自动生成的当前树枝的id，此处也可以换成自己设置的属性，比如“ename”，那么传递的数据就是ename=one-->
-            <!--dataFilter:filter//对返回值进行操作-->
-        <!--}-->
-    <!--};-->
-    <!--// zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）-->
-    <!--var zNodes = [-->
-        <!--{name:"部门",  children:[-->
-                <!--{name:"test1_1"}, {name:"test1_2",  children:[-->
-                        <!--{name:"test1_1"}, {name:"test1_2"}]}]},-->
-        <!--{name:"职位",  children:[-->
-                <!--{name:"test2_1"}, {name:"test2_2"}]}-->
-    <!--];-->
+<!--var zTreeObj;-->
+<!--// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）-->
+<!--var setting = {-->
+<!--view:{-->
+<!--showLine:false,-->
+<!--showIcon:false-->
+<!--},-->
+<!--callback:{-->
+<!--onClick:onClick,-->
+<!--beforeExpand: beforeExpand,-->
+<!--onExpand: onExpand-->
+<!--},-->
+<!--async: {-->
+<!--enable: true,//开启异步-->
+<!--url: "./package.json",-->
+<!--type:"get",-->
+<!--autoParam: ["tId"],//数据传递，tId是系统自动生成的当前树枝的id，此处也可以换成自己设置的属性，比如“ename”，那么传递的数据就是ename=one-->
+<!--dataFilter:filter//对返回值进行操作-->
+<!--}-->
+<!--};-->
+<!--// zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）-->
+<!--var zNodes = [-->
+<!--{name:"部门",  children:[-->
+<!--{name:"test1_1"}, {name:"test1_2",  children:[-->
+<!--{name:"test1_1"}, {name:"test1_2"}]}]},-->
+<!--{name:"职位",  children:[-->
+<!--{name:"test2_1"}, {name:"test2_2"}]}-->
+<!--];-->
 
 
 
-    <!--$(document).ready(function(){-->
-        <!--$.post("{:url('admin/getdepartment')}",{},function (data){-->
-            <!--zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, data);-->
-        <!--});-->
+<!--$(document).ready(function(){-->
+<!--$.post("{:url('admin/getdepartment')}",{},function (data){-->
+<!--zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, data);-->
+<!--});-->
 
-    <!--});-->
-    <!--function onClick() {-->
+<!--});-->
+<!--function onClick() {-->
 
-    <!--}-->
-    <!--function beforeExpand() {-->
+<!--}-->
+<!--function beforeExpand() {-->
 
-    <!--}-->
-    <!--function onExpand() {-->
+<!--}-->
+<!--function onExpand() {-->
 
-    <!--}-->
-    <!--function filter() {-->
+<!--}-->
+<!--function filter() {-->
 
-    <!--}-->
-    <!--var setting = {-->
-        <!--data: {-->
-            <!--simpleData: {-->
-                <!--enable: true,-->
-                <!--idKey: "id",-->
-                <!--pIdKey: "pId",-->
-                <!--rootPId: 0-->
-            <!--}-->
-        <!--}-->
-    <!--};-->
-    <!--var treeObj = $.fn.zTree.getZTreeObj("treeDemo");-->
-    <!--// alert(nodes);-->
+<!--}-->
+<!--var setting = {-->
+<!--data: {-->
+<!--simpleData: {-->
+<!--enable: true,-->
+<!--idKey: "id",-->
+<!--pIdKey: "pId",-->
+<!--rootPId: 0-->
+<!--}-->
+<!--}-->
+<!--};-->
+<!--var treeObj = $.fn.zTree.getZTreeObj("treeDemo");-->
+<!--// alert(nodes);-->
 
 <!--</script>-->
 <!-- Custom Js -->
