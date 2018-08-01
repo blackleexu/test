@@ -83,31 +83,48 @@ class User extends Model{
     }
 
     /**
-     * @param array
-     * @param string
-     * @param string
-     * @param bool
+     * @param $data array
+     * @param $str_id 设置为id的字段
+     * @param $str_name 设置为text的字段
+     * @param $spread 是否处于打开状态
+     * @param $tab_name 当前root标签的名字
      * @return array
      */
+//    public static function tree_item_click($data,$str_id,$str_name,$spread,$tab_name){
+//        $result=[];
+//        $children=[];
+//        $result[0]['name']=$tab_name;
+//        for ($i=0;$i<count($data);$i++){
+//            if(is_array($data[$i])){
+//                self::tree_item_click($data[$i],$str_id,$str_name,$tab_name);
+//            }else{
+//                $children[$i]['text'] = $data[$i][$str_name];
+//                $children[$i]['id'] = $data[$i][$str_id];
+//            }
+//        }
+//        $result[0]['children']=$children;
+//        $result[0]['spread']=$spread;
+//        return $result;
+//    }
     public static function tree_item_click($data,$str_id,$str_name,$spread,$tab_name){
+//        [
+//            { "id" : "ajson1", "parent" : "#", "text" : "Simple root node" },
+//            { "id" : "ajson2", "parent" : "#", "text" : "Root node 2" },
+//            { "id" : "ajson3", "parent" : "ajson1", "text" : "Child 1" },
+//            { "id" : "ajson4", "parent" : "ajson2", "text" : "Child 2" },
+//        ]
+        $length=count($data);
+        $state=['opened'=>true];
         $result=[];
         $children=[];
-        $result[0]['name']=$tab_name;
-        for ($i=0;$i<count($data);$i++){
-            if(is_array($data[$i])){
-                self::tree_item_click($data[$i],$str_id,$str_name,$tab_name);
-            }else{
-                $children[$i]['name'] = $data[$i][$str_name];
-                $children[$i]['id'] = $data[$i][$str_id];
-            }
+        $result[0]=[ "id" => 'root', "parent" => "#", "text" => '用户', 'state'=>$state];
+        $result[1]=[ "id" => $tab_name, "parent" => "root", "text" => $tab_name ,'state'=>$state];
+        for ($i=0;$i<$length;$i++){
+            $result[$i+2]['text'] = $data[$i][$str_name];
+            $result[$i+2]['id'] = $data[$i][$str_id];
+            $result[$i+2]['parent'] = $tab_name;
         }
         $result[0]['children']=$children;
-        $result[0]['spread']=$spread;
         return $result;
     }
-
-
-
-
-
 }

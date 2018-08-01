@@ -21,7 +21,14 @@
     <link href="__STATIC__/admin/assets/js/dataTables/dataTables.bootstrap.css" rel="stylesheet"/>
     <!--<link href="__STATIC__/layer/theme/default/layer.css" rel="stylesheet" />-->
     <link href="__STATIC__/admin/layui/css/layui.css" rel="stylesheet"/>
+    <link href="__STATIC__/admin/dist/themes/default/style.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 
+
+    <!--<script src="__STATIC__/admin/dist/jstree.min.js"></script>-->
+    <!--<script src="__STATIC__/admin/assets/js/jquery-1.10.2.js"></script>-->
     <style>
         .layui-tree li i {
             color: #f36a5a;
@@ -52,7 +59,7 @@
 
     </style>
     <!-- JS Scripts-->
-    <script src="__STATIC__/admin/assets/js/jquery-1.10.2.js"></script>
+
 </head>
 <body>
 <div id="wrapper">
@@ -97,9 +104,6 @@
             <a href="{:url('admin/index')}" class="<?php if(request()->path()=='admin/index') echo 'active-menu'; ?>"><i class="fa fa-dashboard"></i> 用户列表</a>
             </li>
             </ul>
-            <!--<ul id="treeDemo" class="ztree"></ul>-->
-            <!--<ul id="demo1"></ul>-->
-            <!--<ul id="demo2"></ul>-->
         </div>
     </nav>
     <!-- /. NAV SIDE  -->
@@ -111,6 +115,7 @@
                         <label class="col-md-1 control-label">部门：</label>
                         <div class="col-md-2">
                             <select class="form-control" name="did" id="department_search_option" onchange="department_search_option()">
+                                <option value="" disabled selected>请选择</option>
                                 {volist name="department" id="value"}
                                 <option value="{$value.did}">{$value.department}</option>
                                 {/volist}
@@ -122,6 +127,7 @@
                         <div>
                             <span class="col-md-2">
                                 <select class="form-control" name="rid" id="role_search_option" onchange="role_search_option()">
+                                    <option value="" disabled selected>请选择</option>
                                     {volist name="role" id="value"}
                                     <option value="{$value.rid}">{$value.rolename}</option>
                                     {/volist}
@@ -154,8 +160,10 @@
                     <!-- Advanced Tables -->
                     <div class="col-md-2" style="min-height: 600px;padding: 15px;">
                         <div>
-                            <td class="control-label table table-striped table-bordered ">结构</td>
-                            <ul id="treeDemo" class="ztree"></ul>
+                            <td class="control-label table table-striped table-bordered ">结构(点击右键编辑目录)</td>
+                            <div  id="tree">
+                                <ul id="treeDemo" class="ztree"></ul>
+                            </div>
                             <ul id="demo1"></ul>
                             <ul id="demo2"></ul>
                         </div>
@@ -352,14 +360,38 @@
                 </div>
             </div>
         </div>
-    <div id="menu">
-        <div class="menu">功能1</div>
-        <div class="menu">功能2</div>
-        <div class="menu">功能3</div>
-        <div class="menu">功能4</div>
-        <div class="menu">功能5</div>
+        <div class="modal fade" id="tree_dialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">添加用户信息</h4>
+                </div>
+                <div class="modal-body">
+                    <!--<form class="form-horizontal" action="{:url('admin/useradd')}" method="post" enctype="multipart/form-data">-->
+                    <form id="tree_action" class="form-horizontal" method="post">
+                        <input type="hidden" name="did" id="departmentupdateid">
+                        <div class="form-group">
+                            <label class="col-md-2 control-label">部门名称</label>
+                            <div class="col-md-10">
+                                <input type="text" id="departmentupdatename" class="form-control" value="" placeholder="部门名称" name="department"
+                                       autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="button" name="" value="提交" onclick="treeAction()" class="btn btn-default">
+                            <!--<input type="reset" name="" value="重置" class="btn btn-default">-->
+                            <button type="button" class="btn btn-default" onclick="" data-dismiss="modal">关闭
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
     </div>
-    </div>
+</div>
 </div>
 <!-- Bootstrap Js -->
 <script src="__STATIC__/admin/assets/js/bootstrap.min.js"></script>
@@ -374,124 +406,118 @@
 <!---->
 <script>
     $(document).ready(function () {
-    //     var zTreeObj;
-    //     var setting = {
-    //         view:{
-    //             showLine:false,
-    //             showIcon:false
-    //         },
-    //         callback:{
-    //             onClick:onClick,
-    //             beforeExpand: beforeExpand,
-    //             onExpand: onExpand
-    //         },
-    //         async: {
-    //             enable: true,//开启异步
-    //             url: "./package.json",
-    //             type:"get",
-    //             autoParam: ["tId"],//数据传递，tId是系统自动生成的当前树枝的id，此处也可以换成自己设置的属性，比如“ename”，那么传递的数据就是ename=one
-    //             dataFilter:filter//对返回值进行操作
-    //         }
-    //     };
-    //
-    //     var zNodes = [{ id:1, pId:0, name:"父节点 1", open:true,noRemoveBtn:true,noEditBtn:true},
-    //         { id:11, pId:1, name:"叶子节点 1-1",noRemoveBtn:true,noEditBtn:true},
-    //         { id:12, pId:1, name:"叶子节点 1-2"},
-    //         { id:13, pId:1, name:"叶子节点 1-3"},
-    //         { id:2, pId:0, name:"父节点 2", open:true},
-    //         { id:21, pId:2, name:"叶子节点 2-1"},
-    //         { id:22, pId:2, name:"叶子节点 2-2"},
-    //         { id:23, pId:2, name:"叶子节点 2-3"},
-    //         { id:3, pId:0, name:"父节点 3", open:true},
-    //         { id:31, pId:3, name:"叶子节点 3-1"},
-    //         { id:32, pId:3, name:"叶子节点 3-2"},
-    //         { id:33, pId:3, name:"叶子节点 3-3"}
-    // ];
-    //
-    //     $(document).ready(function(){
-    //         $.post("{:url('admin/getdepartment')}",{},function (data){
-    //             zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, zNodes);
-    //         });
-    //
-    //     });
-    //     function onClick() {
-    //
-    //     }
-    //     function beforeExpand() {
-    //
-    //     }
-    //     function onExpand() {
-    //
-    //     }
-    //     function filter() {
-    //
-    //     }
-    //     var setting = {
-    //         data: {
-    //             simpleData: {
-    //                 enable: true,
-    //                 idKey: "id",
-    //                 pIdKey: "pId",
-    //                 rootPId: 0
-    //             }
-    //         }
-    //     };
-    //     var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
-    // alert(nodes);
-
-$.post("{:url('admin/getdepartment')}", {}, function (data) {
-            layui.use(['tree', 'layer'], function () {
-                var layer = layui.layer
-                    , $ = layui.jquery;
-
-                layui.tree({
-                    elem: '#demo1' //指定元素
-                    , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
-                    , click: function (item) { //点击节点回调
-                        var key = item.name;
-                        if (typeof item.id != "undefined") {
-                            $('#user_serach input[name=click_department_key]').val(key);
-                            // $('#user_serach input[name=click_role_key]').val('');
-                            // $('#user_serach input[name=key]').val('');
-                            search();
-                        } else {
-                            $('#user_serach input[name=click_role_key]').val('');
-                            $('#user_serach input[name=click_department_key]').val('');
-                            $('#user_serach input[name=key]').val('');
-                            search();
-                        }
-                    }
-                    , nodes: data
-                });
-            });
+        treeInit();
+        //树形菜单点击事件
+        $('#treeDemo').on("changed.jstree", function (e, data) {
+            var key_text=data.instance.get_node(data.selected).text;//输出当前选中的区域的名称
+            var key_id=data.instance.get_node(data.selected).id;//输出当前选中的区域的id
+            // alert(key_text);
+            $('#departmentupdatename').val(key_text);
+            $('#departmentupdateid').val(key_id);
+            //需要判断是否点击的是左键，如果是右键应该不做操作
+            if (key_id != "root") {
+                $('#user_serach input[name=click_department_key]').val(key_text);
+                search();
+            } else {
+                $('#user_serach input[name=click_role_key]').val('');
+                $('#user_serach input[name=click_department_key]').val('');
+                $('#user_serach input[name=key]').val('');
+                search();
+            }
         });
-        $.post("{:url('admin/getrole')}", {}, function (data) {
-            layui.use(['tree', 'layer'], function () {
-                var layer = layui.layer
-                    , $ = layui.jquery;
-
-                layui.tree({
-                    elem: '#demo2' //指定元素
-                    , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
-                    , click: function (item) { //点击节点回调
-                        var key = item.name;
-                        if (typeof item.id != "undefined") {
-                            // $('#user_serach input[name=click_department_key]').val('');
-                            // $('#user_serach input[name=key]').val('');
-                            $('#user_serach input[name=click_role_key]').val(key);
-                            search();
-                        } else {
-                            $('#user_serach input[name=click_role_key]').val('');
-                            $('#user_serach input[name=click_department_key]').val('');
-                            $('#user_serach input[name=key]').val('');
-                            search();
-                        }
-                    }
-                    , nodes: data
-                });
-            });
-        });
+        // $.post("{:url('admin/getdepartment')}", {}, function (data) {
+        //     layui.use(['tree', 'layer'], function () {
+        //         var layer = layui.layer
+        //             , $ = layui.jquery;
+        //
+        //         layui.tree({
+        //             elem: '#demo1' //指定元素
+        //             , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+        //             , click: function (item) { //点击节点回调
+        //                 // console.log(data);
+        //                 var key = item.name;
+        //                 if (typeof item.id != "undefined") {
+        //                     $('#user_serach input[name=click_department_key]').val(key);
+        //                     // $('#user_serach input[name=click_role_key]').val('');
+        //                     // $('#user_serach input[name=key]').val('');
+        //                     search();
+        //                 } else {
+        //                     $('#user_serach input[name=click_role_key]').val('');
+        //                     $('#user_serach input[name=click_department_key]').val('');
+        //                     $('#user_serach input[name=key]').val('');
+        //                     search();
+        //                 }
+        //             }
+        //             , nodes: data
+        //         });
+        //     });
+        // });
+        // $.post("{:url('admin/getrole')}", {}, function (data) {
+        //     layui.use(['tree', 'layer'], function () {
+        //         var layer = layui.layer
+        //             , $ = layui.jquery;
+        //
+        //         layui.tree({
+        //             elem: '#demo2' //指定元素
+        //             , target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+        //             , click: function (item) { //点击节点回调
+        //                 var key = item.name;
+        //                 if (typeof item.id != "undefined") {
+        //                     // $('#user_serach input[name=click_department_key]').val('');
+        //                     // $('#user_serach input[name=key]').val('');
+        //                     $('#user_serach input[name=click_role_key]').val(key);
+        //                     search();
+        //                 } else {
+        //                     $('#user_serach input[name=click_role_key]').val('');
+        //                     $('#user_serach input[name=click_department_key]').val('');
+        //                     $('#user_serach input[name=key]').val('');
+        //                     search();
+        //                 }
+        //             }
+        //             , nodes: data
+        //         });
+        //     });
+        // });
     });
+
+    function treeInit(){
+        // alert('treeinit');
+        $.post("{:url('admin/getdepartment')}", {}, function (data) {
+            console.log(data);
+            $('#treeDemo').jstree({
+                'plugins': ['types','themes','contextmenu'],
+                'core' : {
+                    'multiple' : true,
+                    'dblclick_toggle': true,
+                    'data' : data
+                },
+                'contextmenu': {    // 右键菜单
+                    'items': {
+                        'edit': {
+                            'label': '编辑',
+                            'action': function (){
+                                $('#tree_dialog').modal('show');
+                                // alert($('#departmentupdatename').val());
+                                // alert($('#departmentupdateid').val());
+                            }
+                        },
+                        'delete': {
+                            'label': '删除',
+                            'action': function () {
+                                alert('删除')
+                            }
+                        },
+                        'new':{
+                            'label': '新建',
+                            'action':function () {
+                                alert('新建')
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    }
 
     $("body").delegate(".my_page_class", "click", function () {
         var page = $(this).html();
@@ -538,7 +564,7 @@ $.post("{:url('admin/getdepartment')}", {}, function (data) {
         var form = $("#user_add").serialize();
         $.post("{:url('admin/useradd')}", form, function (data) {
             console.log(data);
-            $('.modal').map(function () {
+            $('.modal').modal(function () {
                 if (!$(this).is(":hidden")) {
                     $(this).modal('hide');
                 }
@@ -554,7 +580,23 @@ $.post("{:url('admin/getdepartment')}", {}, function (data) {
 
     function search() {
         $.post("{:url('admin/index')}", $('#user_serach').serialize(), function (data) {
+            console.log(data);
             $('#usertable').html($(data).find('#usertable').html());
+        });
+    }
+
+    function treeAction() {
+        $.post("{:url('admin/treeaction')}", $('#tree_action').serialize(), function (data) {
+            console.log(data);
+            if(typeof data.status != "undefined"){
+                layer.msg(data.msg, {icon: 5, time: 500});
+            }else{
+                $('#tree').html($(data).find('#tree').html());
+                // $str="<ul id=\"demo1\">haha</ul>";
+                $('#tree_dialog').modal('hide');
+                // $('#tree').html($str);
+                treeInit();
+            }
         });
     }
 
@@ -617,8 +659,27 @@ $.post("{:url('admin/getdepartment')}", {}, function (data) {
     function department_search_option() {
         var did=$("#department_search_option").children('option:selected').text();
         // alert(did);
-        $('#user_serach input[name=click_role_key]').val(did);
+        $('#user_serach input[name=click_department_key]').val(did);
     }
+
+    function getmousekey() {
+        $('#treeDemo').onmousedown(function (e) {
+            var e=window.event||e;//获取事件对象
+            var value=e.button;
+            if(value==3){
+                return 1;
+            }else{
+                return 0;
+            }
+        })
+    }
+
+    function getinstanceitem() {
+        $('#treeDemo').on("changed.jstree", function (e, data) {
+            return data;
+        });
+    }
+
 </script>
 </body>
 </html>

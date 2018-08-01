@@ -137,6 +137,15 @@ class Index extends BaseController{
         return User::tree_item_click($role_list_arr,'rid','rolename',true,'职位');
     }
 
+    public function getTree(){
+        $role_list_arr=Role::all();
+        $department_list_arr=Department::all();
+        $role_arr=User::tree_item_click($department_list_arr,'did','department',true,'部门');
+        $department_arr=User::tree_item_click($role_list_arr,'rid','rolename',true,'职位');
+        return array_merge($department_arr,$role_arr);
+
+    }
+
     public function getItemByKey(){
         $data  = (new User())->getUserList();
         //爱好表查询
@@ -144,5 +153,19 @@ class Index extends BaseController{
         //用户表爱好id转对应的爱好名
         Hobby::hobby_convert($data,$hobby);
         return $data;
+    }
+
+    public function treeAction(){
+        $data=input('param.');
+        $department=Department::get($data['did']);
+        $department->department=$data['department'];
+        if($department->save()){
+            $this->redirect('admin/index');
+        }else{
+            return ['status'=>0,
+                    'msg'=>'修改失败'
+                ];
+        }
+
     }
 }
